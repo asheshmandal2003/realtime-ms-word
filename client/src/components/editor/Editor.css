@@ -5,11 +5,12 @@
 }
 
 .ql-toolbar{
+    display: flex;
+    justify-content: center;
     background: #cfd8dc;
-    border-radius: 20px;
     position: sticky;
-    top: 0;
     z-index: 1;
+    top: 64px;
 }
 
 .ql-container{

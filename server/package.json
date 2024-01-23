@@ -10,8 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "nodemon": "./node_modules/.bin/nodemon",
-    "devStart": "nodemon index.js",
-    "socketStart": "nodemon socket.js"
+    "devServer": "nodemon index.js",
+    "socketServer": "nodemon socket.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

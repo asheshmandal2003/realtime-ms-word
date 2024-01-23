@@ -38,7 +38,7 @@ const sessionConfig = {
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,
-  methods: ["GET", "POST", "PUT", "DELETE"]
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
 }))
 app.use(session(sessionConfig))
 app.use(express.urlencoded({extended: true, limit: "30mb"}))
