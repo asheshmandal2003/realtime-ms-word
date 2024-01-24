@@ -12,7 +12,7 @@ Welcome to realtime document editor. Here you can create your own document, can 
 
 - **Add Collaborators**: You can add collaborators in your document with "read-only" and "write" policy, "read-only" users are not allowed to edit the document the can only read the document.
 
-- **Document Access Policy**:You can set your document as public, where anyone can view it without registering with the website, or you can set it as private and share it only with people you know.
+- **Document Access Policy**:You can set your document as public, where anyone can view it (who are logged in), or you can set it as private and share it only with people you know.
 
 - **Simple Design**: The whole application is built up with Material UI for the best user experience.
 
