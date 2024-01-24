@@ -7,28 +7,31 @@ import {
   ListItemText,
   Avatar,
   Divider,
-  Typography
+  Typography,
 } from "@mui/material";
 import { AccountCircle, Logout } from "@mui/icons-material";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import {logout} from "../../state/auth.js"
+import { logout } from "../../state/auth.js";
+import { useNavigate } from "react-router-dom";
 
 export default function AvatarWithMenu() {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const dispatch = useDispatch();
-  
-    const handleMenu = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
-  
-    const logOut = () => {
-      dispatch(logout());
-    };
+  const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const dispatch = useDispatch();
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const logOut = () => {
+    dispatch(logout());
+    navigate("/auth/signin");
+  };
   return (
     <>
       <IconButton

@@ -31,6 +31,7 @@ const docSchema = new Schema({
   docAccessType: {
     type: String,
     enum: ["public", "private"],
+    default: "private"
   },
 });
 

@@ -83,7 +83,6 @@ export const shareDoc = async (req, res) => {
     await user.save();
     return res.status(200).json({ message: "Document shared successfully!" });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Internal server error!" });
   }
 };
@@ -92,12 +91,39 @@ export const getDocDetails = async (req, res) => {
   try {
     const { docId } = req.params;
     const doc = await Doc.findById(docId).populate("accessList.userId");
-    console.log(doc);
     return res
       .status(200)
-      .json({ name: doc.docName, accessList: doc.accessList });
+      .json({
+        name: doc.docName,
+        accessList: doc.accessList,
+        docAccessType: doc.docAccessType,
+      });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+
+export const changeDocAccessType = async (req, res) => {
+  try {
+    const { docId } = req.params;
+    await Doc.findByIdAndUpdate(docId, {
+      docAccessType: req.body.docAccessType,
+    });
+    return res.status(200).json({ message: "Access updated!" });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
+export const removeAccess = async(req, res) => {
+  try {
+    const { docId, userId } = req.params;
+    const doc = await Doc.findById(docId);
+    const user = await User.findById(userId)
+    await doc.updateOne({$pull: {accessList: {userId}}})
+    await user.updateOne({$pull:{docs: docId}})
+    return res.status(200).json({ message: "User removed!" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong!" });
   }
-};
+}

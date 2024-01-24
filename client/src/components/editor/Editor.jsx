@@ -37,7 +37,9 @@ export default function Editor() {
   const [docDetails, setDocDetails] = useState({
     name: "Loading...",
     accessList: [],
+    docAccessType: "",
   });
+  const [shareOption, setShareOption] = useState(false)
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -84,70 +86,78 @@ export default function Editor() {
         const user = docDetails.accessList.filter(
           (people) => people.userId._id.localeCompare(id) === 0
         );
-        if(user.length === 0) {
-          toast.warning("You don't have the permission to access the doc!", {
-            position: "top-center",
-            autoClose: 6000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            transition: Bounce,
-          });
-          return navigate("/")}
-        if (user[0].userAccessType === "editor") {
-          return quill.enable();
-        }
-        if (user[0].userAccessType === "viewer") {
-          return quill.disable();
+        if (user.length > 0) {
+          setShareOption(true)
+          if (user[0].userAccessType === "editor") {
+            return quill.enable();
+          }
+          if (user[0].userAccessType === "viewer") {
+            return quill.disable();
+          }
+        } else {
+          if (docDetails.docAccessType === "private") {
+            toast.warning("You don't have the permission to access the doc!", {
+              position: "top-center",
+              autoClose: 6000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "colored",
+              transition: Bounce,
+            });
+            return navigate("/");
+          }
+          if (docDetails.docAccessType === "public") {
+            return quill.disable();
+          }
         }
       }
     }
     access();
   }, [docDetails, documentId]);
 
-  useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
-    setWebSocket(socket);
-    return () => socket.disconnect();
-  }, []);
+  // useEffect(() => {
+  //   const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
+  //   setWebSocket(socket);
+  //   return () => socket.disconnect();
+  // }, []);
 
-  useEffect(() => {
-    if (webSocket === undefined || quill === undefined) return;
-    webSocket.once("load-document", (doc) => {
-      quill.setContents(doc.content);
-    });
-    webSocket.emit("get-document", documentId);
-  }, [webSocket, quill, documentId]);
+  // useEffect(() => {
+  //   if (webSocket === undefined || quill === undefined) return;
+  //   webSocket.once("load-document", (doc) => {
+  //     quill.setContents(doc.content);
+  //   });
+  //   webSocket.emit("get-document", documentId);
+  // }, [webSocket, quill, documentId]);
 
-  useEffect(() => {
-    if (webSocket === undefined || quill === undefined) return;
-    const interval = setInterval(() => {
-      webSocket.emit("save-changes", quill.getContents());
-    }, INTERVAL);
-    return () => clearInterval(interval);
-  }, [webSocket, quill]);
+  // useEffect(() => {
+  //   if (webSocket === undefined || quill === undefined) return;
+  //   const interval = setInterval(() => {
+  //     webSocket.emit("save-changes", quill.getContents());
+  //   }, INTERVAL);
+  //   return () => clearInterval(interval);
+  // }, [webSocket, quill]);
 
-  useEffect(() => {
-    if (webSocket === undefined || quill === undefined) return;
-    function handleChange(delta, oldDelta, source) {
-      if (source !== "user") return;
-      webSocket.emit("send-changes", delta);
-    }
-    quill.on("text-change", handleChange);
-    return () => quill.off("text-change", handleChange);
-  }, [webSocket, quill]);
+  // useEffect(() => {
+  //   if (webSocket === undefined || quill === undefined) return;
+  //   function handleChange(delta, oldDelta, source) {
+  //     if (source !== "user") return;
+  //     webSocket.emit("send-changes", delta);
+  //   }
+  //   quill.on("text-change", handleChange);
+  //   return () => quill.off("text-change", handleChange);
+  // }, [webSocket, quill]);
 
-  useEffect(() => {
-    if (webSocket === undefined || quill === undefined) return;
-    function handleChange(delta) {
-      quill.updateContents(delta);
-    }
-    webSocket.on("receive-changes", handleChange);
-    return () => webSocket.off("receive-changes", handleChange);
-  }, [webSocket, quill]);
+  // useEffect(() => {
+  //   if (webSocket === undefined || quill === undefined) return;
+  //   function handleChange(delta) {
+  //     quill.updateContents(delta);
+  //   }
+  //   webSocket.on("receive-changes", handleChange);
+  //   return () => webSocket.off("receive-changes", handleChange);
+  // }, [webSocket, quill]);
 
   const containerRef = useCallback((container) => {
     if (container === null) return;
@@ -172,6 +182,7 @@ export default function Editor() {
         docId={documentId}
         docName={docDetails.name}
         handleOpen={handleOpen}
+        shareOption={shareOption}
       />
       <div className="container" ref={containerRef}></div>;
       <ShareModal

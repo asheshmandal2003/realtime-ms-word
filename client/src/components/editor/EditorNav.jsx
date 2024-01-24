@@ -24,7 +24,13 @@ const theme = createTheme({
   },
 });
 
-export default function EditorNav({ id, docId, docName, handleOpen }) {
+export default function EditorNav({
+  id,
+  docId,
+  docName,
+  handleOpen,
+  shareOption,
+}) {
   const [input, setInput] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -83,7 +89,11 @@ export default function EditorNav({ id, docId, docName, handleOpen }) {
                 variant="contained"
                 color="info"
                 endIcon={<Send />}
-                sx={{ mr: 2, borderRadius: 10 }}
+                sx={{
+                  mr: 2,
+                  borderRadius: 10,
+                  display: shareOption ? "inline-block" : "none",
+                }}
                 onClick={handleOpen}
               >
                 Share

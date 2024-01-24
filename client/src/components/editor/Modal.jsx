@@ -19,14 +19,16 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as yup from "yup";
 import { toast, Bounce } from "react-toastify";
-import { Close } from "@mui/icons-material";
+import { Close} from "@mui/icons-material";
+import { useState } from "react";
+import { FlexBetween } from "../partials/FlexBetween";
 
 const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 460,
+  width: 540,
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: 3,
@@ -45,7 +47,7 @@ export default function ShareModal({
   const formik = useFormik({
     initialValues: {
       email: "",
-      userAccessType: "viewer",
+      userAccessType: "editor",
     },
     onSubmit: shareDoc,
     validationSchema: yup.object({
@@ -66,6 +68,49 @@ export default function ShareModal({
   async function changeAccess() {
     const formdata = new FormData();
     formdata.append("docAccessType", formik2.values.docAccessType);
+    await axios({
+      method: "PATCH",
+      url: `${
+        import.meta.env.VITE_BACKEND_URL
+      }/user/${id}/document/${docId}/change-access`,
+      data: formdata,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        toast.success(`${res.data.message}`, {
+          position: "top-center",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        getDocDetails();
+      })
+      .catch((err) => {
+        toast.error(`${err.response.data.message}`, {
+          position: "top-center",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      });
+  }
+
+  async function shareDoc() {
+    const formdata = new FormData();
+    formdata.append("email", formik.values.email);
+    formdata.append("userAccessType", formik.values.userAccessType);
     await axios({
       method: "POST",
       url: `${
@@ -105,16 +150,12 @@ export default function ShareModal({
       });
   }
 
-  async function shareDoc(values) {
-    const formdata = new FormData();
-    formdata.append("email", formik.values.email);
-    formdata.append("userAccessType", formik.values.userAccessType);
+  async function removeAccess(userId) {
     await axios({
-      method: "POST",
+      method: "DELETE",
       url: `${
         import.meta.env.VITE_BACKEND_URL
-      }/user/${id}/document/${docId}/change-access`,
-      data: formdata,
+      }/user/${id}/document/${docId}/people/${userId}`,
       headers: {
         "Content-Type": "application/json",
       },
@@ -200,9 +241,16 @@ export default function ShareModal({
                         <ListItemText sx={{ ml: 1 }}>
                           {people.userId.email}
                         </ListItemText>
-                        <IconButton>
-                          <Close />
-                        </IconButton>
+                        {people.isOwner ? (
+                          <Typography>owner</Typography>
+                        ) : (
+                         <FlexBetween alignItems="center">
+                          <Typography mr={1}>{people.userAccessType}</Typography>
+                          <IconButton onClick={()=>removeAccess(people.userId._id)} >
+                            <Close fontSize="small" />
+                          </IconButton>
+                         </FlexBetween>
+                        )}
                       </MenuItem>
                     );
                   })}
@@ -210,20 +258,25 @@ export default function ShareModal({
               </>
             )}
             <Typography fontWeight={500}>General access</Typography>
-            <FormControl>
-              <InputLabel>Documnet access type</InputLabel>
-              <Select
-                name="docAccessType"
-                label="Documnet access type"
-                value={formik2.values.docAccessType}
-                onChange={formik2.handleChange}
-                onMouseUp={formik2.handleSubmit}
-                size="small"
-              >
-                <MenuItem value="private">Restricted</MenuItem>
-                <MenuItem value="public">Anyone can view</MenuItem>
-              </Select>
-            </FormControl>
+            <Box component="form">
+              <FormControl>
+                <InputLabel>Documnet access type</InputLabel>
+                <Select
+                  name="docAccessType"
+                  label="Documnet access type"
+                  value={formik2.values.docAccessType}
+                  onChange={(event) => {
+                    console.log(event.target.value);
+                    formik2.setFieldValue("docAccessType", event.target.value);
+                    formik2.handleSubmit();
+                  }}
+                  size="small"
+                >
+                  <MenuItem value="private">Restricted</MenuItem>
+                  <MenuItem value="public">Anyone can view</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
             <Button variant="contained" type="submit">
               Send
             </Button>

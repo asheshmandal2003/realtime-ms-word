@@ -1,9 +1,11 @@
 import express from "express";
 import {
+  changeDocAccessType,
   createDoc,
   deleteDoc,
   getDocDetails,
   getDocs,
+  removeAccess,
   shareDoc,
   updateDocName,
 } from "../controllers/doc.js";
@@ -18,5 +20,9 @@ router
   .patch(updateDocName)
   .delete(deleteDoc);
 router.route("/:id/document/:docId/share").post(shareDoc);
+router.route("/:id/document/:docId/change-access").patch(changeDocAccessType);
+router
+  .route("/:id/document/:docId/people/:userId")
+  .delete(removeAccess);
 
 export default router;
