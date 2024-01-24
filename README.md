@@ -92,6 +92,6 @@ Welcome to realtime document editor. Here you can create your own document, can 
    - `server/routes/`: Defines the API routes.
    - `server/controllers/`: Implements the route controllers.
    - `server/models/`: Defines the database models (using mongoose ODM).
-   - `client/src/`: Contains React components, actions, reducers, and styles.
-   - `client/state/`: Contains Redux js cofigurations
+   - `client/src/components`: Contains React components.
+   - `client/src/state`: Contains Redux js cofigurations
 
