@@ -71,12 +71,14 @@ Welcome to realtime document editor. Here you can create your own document, can 
    cd client
    ```
 
-8. Install frontend dependencies:
+8. Create a `.env` file using the `.example.env` file.
+
+9. Install frontend dependencies:
 
    ```shell
    yarn
    ```
-4. Start frontend development server:
+10. Start frontend development server:
 
    ```shell
    yarn dev
