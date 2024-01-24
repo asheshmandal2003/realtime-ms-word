@@ -24,7 +24,7 @@ const theme = createTheme({
   },
 });
 
-export default function EditorNav({ id, docId, handleOpen }) {
+export default function EditorNav({ id, docId, docName, handleOpen }) {
   const [input, setInput] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -75,7 +75,7 @@ export default function EditorNav({ id, docId, handleOpen }) {
                 component="div"
                 onClick={() => setInput(!input)}
               >
-                {formik.values.docName}
+                {docName}
               </Typography>
             )}
             <Box ml="auto">

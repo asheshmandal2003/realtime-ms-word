@@ -1,22 +1,37 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-const {Schema} = mongoose
+const { Schema } = mongoose;
 
 const docSchema = new Schema({
-    docName: {
+  docName: {
+    type: String,
+    default: "Untitled Document",
+  },
+  content: {
+    type: Object,
+    default: "",
+  },
+  accessList: [
+    {
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      isOwner: {
+        type: Boolean,
+        default: false,
+      },
+      userAccessType: {
         type: String,
-        default: "Untitled Document"
+        enum: ["viewer", "editor"],
+        default: "editor",
+      },
     },
-    content: {
-        type: Object,
-        default: ""
-    },
-    accessList: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "User"
-        }
-    ]
-})
+  ],
+  docAccessType: {
+    type: String,
+    enum: ["public", "private"],
+  },
+});
 
-export const Doc = mongoose.model("Doc", docSchema)
+export const Doc = mongoose.model("Doc", docSchema);

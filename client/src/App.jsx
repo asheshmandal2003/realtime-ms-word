@@ -21,7 +21,7 @@ function App() {
         />
         <Route
           path="/document/:documentId"
-          element={user ? <Editor /> : <Navigate to="/auth/signin" />}
+          element={<Editor />}
         />
       </Routes>
       <ToastContainer />
