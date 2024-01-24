@@ -118,46 +118,46 @@ export default function Editor() {
     access();
   }, [docDetails, documentId]);
 
-  // useEffect(() => {
-  //   const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
-  //   setWebSocket(socket);
-  //   return () => socket.disconnect();
-  // }, []);
+  useEffect(() => {
+    const socket = io(import.meta.env.VITE_SOCKET_SERVER_URL);
+    setWebSocket(socket);
+    return () => socket.disconnect();
+  }, []);
 
-  // useEffect(() => {
-  //   if (webSocket === undefined || quill === undefined) return;
-  //   webSocket.once("load-document", (doc) => {
-  //     quill.setContents(doc.content);
-  //   });
-  //   webSocket.emit("get-document", documentId);
-  // }, [webSocket, quill, documentId]);
+  useEffect(() => {
+    if (webSocket === undefined || quill === undefined) return;
+    webSocket.once("load-document", (doc) => {
+      quill.setContents(doc.content);
+    });
+    webSocket.emit("get-document", documentId);
+  }, [webSocket, quill, documentId]);
 
-  // useEffect(() => {
-  //   if (webSocket === undefined || quill === undefined) return;
-  //   const interval = setInterval(() => {
-  //     webSocket.emit("save-changes", quill.getContents());
-  //   }, INTERVAL);
-  //   return () => clearInterval(interval);
-  // }, [webSocket, quill]);
+  useEffect(() => {
+    if (webSocket === undefined || quill === undefined) return;
+    const interval = setInterval(() => {
+      webSocket.emit("save-changes", quill.getContents());
+    }, INTERVAL);
+    return () => clearInterval(interval);
+  }, [webSocket, quill]);
 
-  // useEffect(() => {
-  //   if (webSocket === undefined || quill === undefined) return;
-  //   function handleChange(delta, oldDelta, source) {
-  //     if (source !== "user") return;
-  //     webSocket.emit("send-changes", delta);
-  //   }
-  //   quill.on("text-change", handleChange);
-  //   return () => quill.off("text-change", handleChange);
-  // }, [webSocket, quill]);
+  useEffect(() => {
+    if (webSocket === undefined || quill === undefined) return;
+    function handleChange(delta, oldDelta, source) {
+      if (source !== "user") return;
+      webSocket.emit("send-changes", delta);
+    }
+    quill.on("text-change", handleChange);
+    return () => quill.off("text-change", handleChange);
+  }, [webSocket, quill]);
 
-  // useEffect(() => {
-  //   if (webSocket === undefined || quill === undefined) return;
-  //   function handleChange(delta) {
-  //     quill.updateContents(delta);
-  //   }
-  //   webSocket.on("receive-changes", handleChange);
-  //   return () => webSocket.off("receive-changes", handleChange);
-  // }, [webSocket, quill]);
+  useEffect(() => {
+    if (webSocket === undefined || quill === undefined) return;
+    function handleChange(delta) {
+      quill.updateContents(delta);
+    }
+    webSocket.on("receive-changes", handleChange);
+    return () => webSocket.off("receive-changes", handleChange);
+  }, [webSocket, quill]);
 
   const containerRef = useCallback((container) => {
     if (container === null) return;
