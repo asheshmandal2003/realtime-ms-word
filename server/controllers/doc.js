@@ -11,6 +11,7 @@ export const createDoc = async (req, res) => {
       isOwner: true,
       userAccessType: "editor",
     });
+    user.createdDocs.unshift(newDoc._id);
     user.docs.unshift(newDoc._id);
     await newDoc.save();
     await user.save();
@@ -36,13 +37,11 @@ export const deleteDoc = async (req, res) => {
     const { docId } = req.params;
     const doc = await Doc.findById(docId).populate("accessList.userId");
     for (let people of doc.accessList) {
-      const user = await people.userId.updateOne({ $pull: { docs: docId } });
-      console.log(user);
+      await people.userId.updateOne({ $pull: { docs: docId } });
     }
     await Doc.findByIdAndDelete(docId);
     return res.status(200).json({ message: "Document deleted successfully!" });
   } catch (error) {
-    console.log(error.message);
     return res.status(500).json({ message: "Internal server error!" });
   }
 };
@@ -91,13 +90,11 @@ export const getDocDetails = async (req, res) => {
   try {
     const { docId } = req.params;
     const doc = await Doc.findById(docId).populate("accessList.userId");
-    return res
-      .status(200)
-      .json({
-        name: doc.docName,
-        accessList: doc.accessList,
-        docAccessType: doc.docAccessType,
-      });
+    return res.status(200).json({
+      name: doc.docName,
+      accessList: doc.accessList,
+      docAccessType: doc.docAccessType,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong!" });
   }
@@ -114,16 +111,16 @@ export const changeDocAccessType = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong!" });
   }
 };
-export const removeAccess = async(req, res) => {
+export const removeAccess = async (req, res) => {
   try {
     const { docId, userId } = req.params;
     const doc = await Doc.findById(docId);
-    const user = await User.findById(userId)
-    await doc.updateOne({$pull: {accessList: {userId}}})
-    await user.updateOne({$pull:{docs: docId}})
+    const user = await User.findById(userId);
+    await doc.updateOne({ $pull: { accessList: { userId } } });
+    await user.updateOne({ $pull: { docs: docId } });
     return res.status(200).json({ message: "User removed!" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong!" });
   }
-}
+};

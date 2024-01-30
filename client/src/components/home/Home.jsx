@@ -20,9 +20,9 @@ export default function Home() {
       url: `${import.meta.env.VITE_BACKEND_URL}/user/${
         user._id
       }/document/create`,
-      headers:{
-        "Content-Type": "application/json"
-      }
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
       .then((res) => navigate(`/document/${res.data._id}`))
       .catch((err) => {
@@ -70,8 +70,8 @@ export default function Home() {
   return (
     <Box width="100%" minHeight="100vh" bgcolor="#e0e0e0">
       <Navbar />
-      <Grid container spacing={6} p={6}>
-        <Grid item md={2}>
+      <Grid container spacing={6} p={6} columns={{ xs: 1, sm: 12, md: 12 }}>
+        <Grid item md={2} sm={4} xs={1} alignContent="center">
           <Docs
             icon={<AddIcon sx={{ fontSize: 50, color: "#555", mt: 9 }} />}
             text="Blank Document"
@@ -82,7 +82,7 @@ export default function Home() {
         {docs.length > 0 &&
           docs.map((doc) => {
             return (
-              <Grid key={doc._id} item md={2}>
+              <Grid key={doc._id} item md={2} sm={4} xs={1}>
                 <Docs
                   docId={doc._id}
                   icon={

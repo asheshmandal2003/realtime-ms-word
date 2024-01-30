@@ -7,6 +7,7 @@ export default function LoadingBtn({
   pos,
   startIcon,
   endIcon,
+  fullWidth
 }) {
   return (
     <LoadingButton
@@ -16,6 +17,7 @@ export default function LoadingBtn({
       endIcon={endIcon}
       startIcon={startIcon}
       variant="contained"
+      fullWidth={fullWidth}
     >
       {btnText}
     </LoadingButton>

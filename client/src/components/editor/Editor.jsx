@@ -183,6 +183,7 @@ export default function Editor() {
         docName={docDetails.name}
         handleOpen={handleOpen}
         shareOption={shareOption}
+        getDocDetails={getDocDetails}
       />
       <div className="container" ref={containerRef}></div>;
       <ShareModal

@@ -9,16 +9,21 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import { AccountCircle, Logout } from "@mui/icons-material";
+import { Delete, Logout } from "@mui/icons-material";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../state/auth.js";
 import { useNavigate } from "react-router-dom";
+import { deepOrange } from "@mui/material/colors";
+import axios from "axios";
+import { toast, Bounce } from "react-toastify";
 
 export default function AvatarWithMenu() {
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -28,9 +33,84 @@ export default function AvatarWithMenu() {
     setAnchorEl(null);
   };
 
-  const logOut = () => {
-    dispatch(logout());
+  const logOut = async () => {
+    setLoggingOut(true);
+    await axios
+      .post(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((result) => {
+        dispatch(logout());
+        setLoggingOut(false);
+        toast.success(`${result.data.message}`, {
+          position: "top-right",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      })
+      .catch((err) => {
+        setLoggingOut(false);
+        toast.error(`${err.response.data.message}`, {
+          position: "top-right",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      });
+
     navigate("/auth/signin");
+  };
+
+  const deleteAc = async () => {
+    setLoggingOut(true);
+    await axios
+      .delete(`${import.meta.env.VITE_BACKEND_URL}/auth/delete/${user._id}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        dispatch(logout());
+        setLoggingOut(false);
+        toast.success(`${res.data.message}`, {
+          position: "top-right",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      })
+      .catch((err) => {
+        setLoggingOut(false);
+        toast.error(`${err.response.data.message}`, {
+          position: "top-right",
+          autoClose: 6000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+      });
   };
   return (
     <>
@@ -44,7 +124,16 @@ export default function AvatarWithMenu() {
         onClick={handleMenu}
         sx={{ mr: 2 }}
       >
-        <AccountCircle sx={{ height: 44, width: 44, color: "#78909c" }} />
+        <Avatar
+          sx={{
+            height: 44,
+            width: 44,
+            color: "#000",
+            bgcolor: deepOrange[500],
+          }}
+        >
+          {user.first_name.charAt(0)}
+        </Avatar>
       </IconButton>
       <Menu
         id="menu-appbar"
@@ -63,19 +152,38 @@ export default function AvatarWithMenu() {
         sx={{ mt: "40px", padding: 5 }}
       >
         <MenuList sx={{ width: 200 }}>
-          <MenuItem onClick={handleClose}>
+          <MenuItem
+            onClick={() => {
+              navigate("/profile");
+              handleClose();
+            }}
+          >
             <Avatar sx={{ mr: 1 }} /> Profile
           </MenuItem>
-          <MenuItem onClick={handleClose}>
-            <Avatar sx={{ mr: 1 }} /> My Account
-          </MenuItem>
           <Divider />
-          <MenuItem onClick={logOut}>
+          <MenuItem onClick={logOut} disabled={loggingOut}>
             <ListItemIcon>
               <Logout color="error" />
             </ListItemIcon>
             <ListItemText>
-              <Typography color="error">Logout</Typography>
+              {
+                loggingOut?
+                <Typography color="error">Logging out...</Typography>:
+                <Typography color="error">Logout</Typography>
+              }
+            </ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={deleteAc} disabled={loggingOut}>
+            <ListItemIcon>
+              <Delete color="error" />
+            </ListItemIcon>
+            <ListItemText>
+              {
+                loggingOut ?
+                <Typography color="error">Deleting...</Typography>:
+                <Typography color="error">Delete Account</Typography>
+              }
             </ListItemText>
           </MenuItem>
         </MenuList>

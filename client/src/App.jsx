@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Box } from "@mui/material";
 import Signin from "./components/auth/signin/Signin";
 import { useSelector } from "react-redux";
+import Profile from "./components/profile/Profile";
 
 function App() {
   const user = useSelector((state) => state.user);
@@ -28,6 +29,10 @@ function App() {
         <Route
           path="/document/:documentId"
           element={user ? <Editor /> : <Navigate to="/auth/signin" />}
+        />
+        <Route
+          path="/profile"
+          element={user ? <Profile /> : <Navigate to="/auth/signin" />}
         />
       </Routes>
       <ToastContainer />

@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Container,
+  IconButton,
   Paper,
   TextField,
   ThemeProvider,
@@ -14,6 +15,7 @@ import AvatarWithMenu from "../partials/Avatar";
 import { useState } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
@@ -30,11 +32,13 @@ export default function EditorNav({
   docName,
   handleOpen,
   shareOption,
+  getDocDetails,
 }) {
+  const navigate = useNavigate();
   const [input, setInput] = useState(false);
   const formik = useFormik({
     initialValues: {
-      docName: "Untitled Document",
+      docName: "",
     },
     onSubmit: handleSubmit,
   });
@@ -55,7 +59,7 @@ export default function EditorNav({
         "Content-Type": "application/json",
       },
     })
-      .then((res) => console.log(res.data))
+      .then((res) => getDocDetails())
       .catch((err) => console.log(err));
   }
 
@@ -64,7 +68,9 @@ export default function EditorNav({
       <Paper sx={{ position: "sticky", top: 0, zIndex: 1 }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
-            <Description sx={{ fontSize: 40, color: "#0091ea", mr: 1 }} />
+            <IconButton onClick={() => navigate("/")}>
+              <Description sx={{ fontSize: 40, color: "#0091ea", mr: 1 }} />
+            </IconButton>
             {input ? (
               <Box component="form" onSubmit={formik.handleSubmit}>
                 <TextField
@@ -92,7 +98,7 @@ export default function EditorNav({
                 sx={{
                   mr: 2,
                   borderRadius: 10,
-                  display: shareOption ? "inline-block" : "none",
+                  display: !shareOption && "none",
                 }}
                 onClick={handleOpen}
               >

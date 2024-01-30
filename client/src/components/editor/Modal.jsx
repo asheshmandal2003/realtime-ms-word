@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import {
   Avatar,
   Button,
+  CircularProgress,
   FormControl,
   IconButton,
   InputLabel,
@@ -19,9 +20,10 @@ import { useFormik } from "formik";
 import axios from "axios";
 import * as yup from "yup";
 import { toast, Bounce } from "react-toastify";
-import { Close} from "@mui/icons-material";
+import { Close, Send } from "@mui/icons-material";
 import { useState } from "react";
 import { FlexBetween } from "../partials/FlexBetween";
+import LoadingBtn from "../partials/LoadingBtn";
 
 const style = {
   position: "absolute",
@@ -44,6 +46,7 @@ export default function ShareModal({
   accessList,
   getDocDetails,
 }) {
+  const [sending, setSending] = useState(false);
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -66,6 +69,7 @@ export default function ShareModal({
   });
 
   async function changeAccess() {
+    setSending(true)
     const formdata = new FormData();
     formdata.append("docAccessType", formik2.values.docAccessType);
     await axios({
@@ -79,6 +83,7 @@ export default function ShareModal({
       },
     })
       .then((res) => {
+        setSending(false)
         toast.success(`${res.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -93,6 +98,7 @@ export default function ShareModal({
         getDocDetails();
       })
       .catch((err) => {
+        setSending(false)
         toast.error(`${err.response.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -108,6 +114,7 @@ export default function ShareModal({
   }
 
   async function shareDoc() {
+    setSending(true)
     const formdata = new FormData();
     formdata.append("email", formik.values.email);
     formdata.append("userAccessType", formik.values.userAccessType);
@@ -122,6 +129,7 @@ export default function ShareModal({
       },
     })
       .then((res) => {
+        setSending(false)
         toast.success(`${res.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -136,6 +144,7 @@ export default function ShareModal({
         getDocDetails();
       })
       .catch((err) => {
+        setSending(false)
         toast.error(`${err.response.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -151,6 +160,7 @@ export default function ShareModal({
   }
 
   async function removeAccess(userId) {
+    setSending(true)
     await axios({
       method: "DELETE",
       url: `${
@@ -161,6 +171,7 @@ export default function ShareModal({
       },
     })
       .then((res) => {
+        setSending(false)
         toast.success(`${res.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -175,6 +186,7 @@ export default function ShareModal({
         getDocDetails();
       })
       .catch((err) => {
+        setSending(false)
         toast.error(`${err.response.data.message}`, {
           position: "top-center",
           autoClose: 6000,
@@ -244,12 +256,20 @@ export default function ShareModal({
                         {people.isOwner ? (
                           <Typography>owner</Typography>
                         ) : (
-                         <FlexBetween alignItems="center">
-                          <Typography mr={1}>{people.userAccessType}</Typography>
-                          <IconButton onClick={()=>removeAccess(people.userId._id)} >
-                            <Close fontSize="small" />
-                          </IconButton>
-                         </FlexBetween>
+                          <FlexBetween alignItems="center">
+                            <Typography mr={1}>
+                              {people.userAccessType}
+                            </Typography>
+                            <IconButton
+                              onClick={() => removeAccess(people.userId._id)}
+                            >
+                              {
+                                sending ?
+                                <CircularProgress sx={{fontSize: "small"}}/>:
+                                <Close fontSize="small" />
+                              }
+                            </IconButton>
+                          </FlexBetween>
                         )}
                       </MenuItem>
                     );
@@ -271,15 +291,25 @@ export default function ShareModal({
                     formik2.handleSubmit();
                   }}
                   size="small"
+                  disabled={sending}
                 >
                   <MenuItem value="private">Restricted</MenuItem>
                   <MenuItem value="public">Anyone can view</MenuItem>
                 </Select>
               </FormControl>
             </Box>
-            <Button variant="contained" type="submit">
-              Send
-            </Button>
+            {sending ? (
+              <LoadingBtn
+                btnText="Send"
+                pos="end"
+                endIcon={<Send />}
+                fullWidth={true}
+              />
+            ) : (
+              <Button variant="contained" type="submit" endIcon={<Send />}>
+                Send
+              </Button>
+            )}
           </Stack>
         </Box>
       </Modal>
