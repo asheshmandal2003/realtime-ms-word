@@ -55,9 +55,13 @@ export const deleteAc = async (req, res) => {
         const foundDoc = await Doc.findById(doc._id).populate(
           "accessList.userId"
         );
-        foundDoc.accessList.map(async (people) => {
-          await people.userId.updateOne({ $pull: { docs: doc._id } });
-        });
+        if (foundDoc.accessList.length > 0) {
+          foundDoc.accessList.map(async (people) => {
+            if (people.userId) {
+              await people.userId.updateOne({ $pull: { docs: doc._id } });
+            }
+          });
+        }
       });
       user.createdDocs.map(async (doc) => {
         await Doc.findByIdAndDelete(doc._id);
